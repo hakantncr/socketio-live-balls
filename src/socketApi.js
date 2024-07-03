@@ -5,17 +5,21 @@ const socketApi = {  };
 socketApi.io = io;
 
 const users = {  };
+
+// helpers
+const randomColor = require('../helpers/randomColor');
+
 // CONNECT
 io.on('connection', (socket) => {
     console.log('a user connected');
-
     socket.on('newUser', (data) => {
         const defaultData = {
             id: socket.id,
             position: {
                 x: 0,
                 y: 0
-            }
+            },
+            color: randomColor()
         };
 
         const userData = Object.assign(data, defaultData);
@@ -25,6 +29,7 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('newUser', users[socket.id]);
         socket.emit('initPlayers', users);
     });
+
     // DISCONNECT
     socket.on('disconnect', () => {
         socket.broadcast.emit('disUser', users[socket.id]);
