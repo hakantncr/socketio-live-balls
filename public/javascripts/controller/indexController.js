@@ -11,6 +11,13 @@ $scope.init = () => {
         return false;
 };
 
+   function scrollTop() {
+       setTimeout(() => {
+           const element = document.getElementById('chat-area');
+           element.scrollTop = element.scrollHeight;
+       });
+   }
+
 function initSocket(username) {
     const connectionOptions = {
         reconnectionAttempts: 3,
@@ -62,6 +69,12 @@ socket.on('animate', (data) => {
     });
 });
 
+socket.on('newMessage', (message) => {
+    $scope.messages.push(message);
+    $scope.$apply();
+    scrollTop();
+});
+
     let animate = false;
 $scope.onClickPlayer = ($event) => {
     if (!animate) {
@@ -89,10 +102,10 @@ $scope.onClickPlayer = ($event) => {
         $scope.messages.push(messageData);
         $scope.message = '';
 
-        setTimeout(() => {
-            const element = document.getElementById('chat-area');
-            element.scrollTop = element.scrollHeight;
-        });
+        socket.emit('newMessage', messageData);
+
+        scrollTop();
+
     };
 
     }).catch((err) => {
