@@ -1,7 +1,7 @@
 app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFactory) => {
 
-    $scope.messages = [ ];
-    $scope.players = { };
+    $scope.messages = [];
+    $scope.players = {};
 
     $scope.init = () => {
         const username = prompt('Enter username');
@@ -10,37 +10,36 @@ app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFacto
         else
             return false;
     };
-
     function scrollTop() {
-       setTimeout(() => {
-           const element = document.getElementById('chat-area');
-           element.scrollTop = element.scrollHeight;
-       });
+        setTimeout(() => {
+            const element = document.getElementById('chat-area');
+            element.scrollTop = element.scrollHeight;
+        });
     }
-
     function showBubble(id, message) {
-        $('#'+ id).find('.message').show().html(message);
+        $('#' + id).find('.message').show().html(message);
 
         setTimeout(() => {
-            $('#'+ id).find('.message').hide()
+            $('#' + id).find('.message').hide()
         }, 2000);
     }
 
-    function initSocket(username) {
-       const connectionOptions = {
-           reconnectionAttempts: 3,
-           reconnectionDelay: 600
-    };
+    async function initSocket(username) {
+        const connectionOptions = {
+            reconnectionAttempts: 3,
+            reconnectionDelay: 600
+        };
 
-    indexFactory.connectSocket('http://localhost:3000', connectionOptions)
-        .then((socket) => {
-            socket.emit('newUser', { username });
+        try {
+            const socket = await indexFactory.connectSocket('http://localhost:3000', connectionOptions);
+
+            socket.emit('newUser', {username});
 
             socket.on('initPlayers', (players) => {
                 $scope.players = players;
                 $scope.$apply();
-
             });
+
             socket.on('newUser', (data) => {
                 const messageData = {
                     type: {
@@ -54,6 +53,7 @@ app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFacto
                 scrollTop();
                 $scope.$apply();
             });
+
             socket.on('disUser', (data) => {
                 const messageData = {
                     type: {
@@ -62,7 +62,6 @@ app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFacto
                     },
                     username: data.username
                 }; // info
-
                 $scope.messages.push(messageData);
                 delete $scope.players[data.id];
                 scrollTop();
@@ -71,7 +70,7 @@ app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFacto
 
             socket.on('animate', (data) => {
                 console.log(data);
-                $('#'+ data.socketId).animate({'left': data.x, 'top': data.y }, () => {
+                $('#' + data.socketId).animate({'left': data.x, 'top': data.y}, () => {
                     animate = false;
                 });
             });
@@ -88,9 +87,9 @@ app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFacto
                 if (!animate) {
                     let x = $event.offsetX;
                     let y = $event.offsetY;
-                    socket.emit('animate', { x, y });
+                    socket.emit('animate', {x, y});
                     animate = true;
-                    $('#'+ socket.id).animate({'left': x, 'top': y }, () => {
+                    $('#' + socket.id).animate({'left': x, 'top': y}, () => {
                         animate = false;
                     });
                 }
@@ -113,8 +112,8 @@ app.controller("indexController", ['$scope', 'indexFactory', ($scope, indexFacto
                 showBubble(socket.id, message);
                 scrollTop();
             };
-        }).catch((err) => {
+        }catch(err){
             console.log(err);
-        });
-   }
+        }
+    }
 }]);
