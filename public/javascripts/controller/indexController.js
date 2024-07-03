@@ -35,10 +35,11 @@ socket.on('newUser', (data) => {
         }, // info
         username: data.username
     };
-
-$scope.messages.push(messageData);
-$scope.$apply();
+    $scope.messages.push(messageData);
+    $scope.players[data.id] = data;
+    $scope.$apply();
 });
+
 // DISCONNECT
 socket.on('disUser', (data) => {
     const messageData = {
@@ -48,7 +49,9 @@ socket.on('disUser', (data) => {
         },
         username: data.username
     }; // info
+
     $scope.messages.push(messageData);
+    delete $scope.players[data.id];
     $scope.$apply();
 });
 
