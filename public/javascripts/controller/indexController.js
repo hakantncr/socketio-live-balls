@@ -30,8 +30,8 @@ socket.on('initPlayers', (players) => {
 socket.on('newUser', (data) => {
     const messageData = {
         type: {
-            code: 0,
-            message: 1 // login messages
+            code: 0, // server or user message
+            message: 1 // login or disconnect message
         }, // info
         username: data.username
     };
@@ -45,7 +45,7 @@ socket.on('disUser', (data) => {
     const messageData = {
         type: {
             code: 0,
-            message: 0 // 0 disconnect message
+            message: 0
         },
         username: data.username
     }; // info
@@ -76,7 +76,21 @@ $scope.onClickPlayer = ($event) => {
             animate = false;
         });
     }
-};
+ };
+    $scope.newMessage = () => {
+      let message = $scope.message;
+        const messageData = {
+            type: {
+                code: 1,
+            },
+            username: username,
+            text: message
+        };
+        $scope.messages.push(messageData);
+        $scope.message = '';
+
+    };
+
     }).catch((err) => {
         console.log(err);
     });
