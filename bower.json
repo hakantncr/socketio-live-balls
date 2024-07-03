@@ -9,6 +9,7 @@
   "homepage": "https://github.com/hakantncr/socketio-live-balls",
   "dependencies": {
     "angular": "^1.8.3",
-    "semantic": "^2.5.0"
+    "semantic": "^2.5.0",
+    "jquery": "^3.7.1"
   }
 }
